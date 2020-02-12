@@ -16,7 +16,7 @@ This post is for you if:
 - You have at least a slight idea of what the PCA promise is;
 - You have a decent understanding of what the covariance matrix is about;
 - You have a solid foundation in linear algebra, e.g., comfortable with the concept of matrices being transformations that rotate and/or stretch spaces; and
-- You are ready to discover the principal components, instead of being told what they are!
+- Your heart is longing to discover the principal components, instead of being told what they are!
 
 
 ```python
