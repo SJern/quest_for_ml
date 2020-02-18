@@ -21,12 +21,12 @@ This post is for you if:
 ## How to Choose P?
 After hearing my dissatisfaction, my friend [Calvin](https://calvinfeng.github.io/) recommended this paper by Jonathon Shlens - [A Tutorial on Principal Component Analysis](https://arxiv.org/pdf/1404.1100.pdf) to me. It is by far the best resource I have come across on PCA. However, it's also a bit lengthier than your typical blog post, so the remainder of this post will focus on section 5 of the paper. In there, Jonathon immediately establishes the following goal:
 > The [original] data set is $$X$$, an $$m × n$$ matrix.<br>
-> Find some orthonormal matrix $$P$$ in $$Y = PX$$ such that $$C_Y \equiv \frac{1}{n}YY^T$$ is a diagonal matrix.[^1]<br>
+> Find some orthonormal matrix $$P$$ in $$Y = PX$$ such that $$C_Y \equiv \frac{1}{n}YY^T$$ is a diagonal matrix.[1]<br>
 > The rows of $$P$$ shall be the principal components of $$X$$.
-
-[^1]: The reason orthonormality is part of the goal is that we simply want to rotate X. We do not want to modify X. We only want to re-express X by carefully choosing a change of basis.
 
 
 ```python
 
 ```
+
+[1]: The reason orthonormality is part of the goal is that we do not want to do anything more than rotating X. We do not want to modify X. We only want to re-express X by carefully choosing a change of basis.
