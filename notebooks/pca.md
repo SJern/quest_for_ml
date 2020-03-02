@@ -116,6 +116,7 @@ feat\_d &  0.571006 &  0.336628 &  0.905613 &  0.825542 &  0.441280 &  0.318327 
 \end{array}
 $$
 $$
+\small
 \begin{array} {cc}
 X & \text{Covariance Matrix of }X \\
 \begin{array} {|l|rrrrrr|}
@@ -138,6 +139,59 @@ feat\_d &  0.571006 &  0.336628 &  0.905613 &  0.825542 &  0.441280 &  0.318327 
 \end{array}
 $$
 $$
+\footnotesize
+\begin{array} {cc}
+X & \text{Covariance Matrix of }X \\
+\begin{array} {|l|rrrrrr|}
+\hline
+{} &   sample0 &   sample1 &   sample2 &   sample3 &   sample4 &   sample5 \\ \hline
+feat\_a &  0.293459 &  0.077714 &  0.905751 &  0.613897 &  0.060830 &  0.379016 \\
+feat\_b &  0.378693 &  0.113846 &  0.214324 &  0.538663 &  0.691506 &  0.941329 \\
+feat\_c &  0.080650 &  0.274110 &  0.981330 &  0.051426 &  0.970625 &  0.987066 \\
+feat\_d &  0.571006 &  0.336628 &  0.905613 &  0.825542 &  0.441280 &  0.318327 \\ \hline
+\end{array}
+&
+\begin{array}{|l|rrrr|}
+\hline
+{} &  new\_feat\_\_e &  new\_feat\_\_f &  new\_feat\_\_g &  new\_feat\_\_h \\
+\hline
+new\_feat\_e &     1.154401 &    -0.000000 &     -0.00000 &     0.000000 \\
+new\_feat\_f &    -0.000000 &     0.170968 &      0.00000 &     0.000000 \\
+new\_feat\_g &    -0.000000 &     0.000000 &      0.01666 &    -0.000000 \\
+new\_feat\_h &     0.000000 &     0.000000 &     -0.00000 &     0.073687 \\
+\hline
+\end{array}
+\\
+\end{array}
+$$
+$$
+\scriptsize
+\begin{array} {cc}
+X & \text{Covariance Matrix of }X \\
+\begin{array} {|l|rrrrrr|}
+\hline
+{} &   sample0 &   sample1 &   sample2 &   sample3 &   sample4 &   sample5 \\ \hline
+feat\_a &  0.293459 &  0.077714 &  0.905751 &  0.613897 &  0.060830 &  0.379016 \\
+feat\_b &  0.378693 &  0.113846 &  0.214324 &  0.538663 &  0.691506 &  0.941329 \\
+feat\_c &  0.080650 &  0.274110 &  0.981330 &  0.051426 &  0.970625 &  0.987066 \\
+feat\_d &  0.571006 &  0.336628 &  0.905613 &  0.825542 &  0.441280 &  0.318327 \\ \hline
+\end{array}
+&
+\begin{array}{|l|rrrr|}
+\hline
+{} &  new\_feat\_\_e &  new\_feat\_\_f &  new\_feat\_\_g &  new\_feat\_\_h \\
+\hline
+new\_feat\_e &     1.154401 &    -0.000000 &     -0.00000 &     0.000000 \\
+new\_feat\_f &    -0.000000 &     0.170968 &      0.00000 &     0.000000 \\
+new\_feat\_g &    -0.000000 &     0.000000 &      0.01666 &    -0.000000 \\
+new\_feat\_h &     0.000000 &     0.000000 &     -0.00000 &     0.073687 \\
+\hline
+\end{array}
+\\
+\end{array}
+$$
+$$
+\tiny
 \begin{array} {cc}
 X & \text{Covariance Matrix of }X \\
 \begin{array} {|l|rrrrrr|}
