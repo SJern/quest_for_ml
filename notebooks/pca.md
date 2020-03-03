@@ -20,21 +20,21 @@ This post is for you if:
 
 ## How to Choose P?
 After hearing my dissatisfaction, my friend [Calvin](https://calvinfeng.github.io/) recommended this paper by Jonathon Shlens - [A Tutorial on Principal Component Analysis](https://arxiv.org/pdf/1404.1100.pdf) to me. It is by far the best resource I have come across on PCA. However, it's also a bit lengthier than your typical blog post, so the remainder of this post will focus on section 5 of the paper. In there, Jonathon immediately establishes the following goal:
-> The [original] dataset is $$X$$, an $$m × n$$ matrix.<br>
-> Find some orthonormal matrix $$P$$ in $$Y = PX$$ such that $$C_Y \equiv \frac{1}{n}YY^T$$ is a diagonal matrix.[1]<br>
-> The rows of $$P$$ shall be principal components of $$X$$.
+> The [original] dataset is $X$, an $m × n$ matrix.<br>
+> Find some orthonormal matrix $P$ in $Y = PX$ such that $C_Y \equiv \frac{1}{n}YY^T$ is a diagonal matrix.[1]<br>
+> The rows of $P$ shall be principal components of $X$.
 
-As you might have noticed, $$C_Y$$ here is the covariance matrix of our rotated dataset $$Y$$. Why do we want $$C_Y$$ to be diagonal? Before we answer this question, let’s generate a dataset $$X$$ consisting of 4 features with some random values.
+As you might have noticed, $C_Y$ here is the covariance matrix of our rotated dataset $Y$. Why do we want $C_Y$ to be diagonal? Before we answer this question, let’s generate a dataset $X$ consisting of 4 features with some random values.
 
 
 ```python
 import numpy as np
-feature_num, sample_num = 4, 6
+feature_num, sample_num = 4, 4
 x = np.random.rand(feature_num, sample_num)
 
 def covariance_matrix(dataset):
     sample_count = dataset.shape[1]
-    return (dataset @ dataset.transpose() / sample_count).round(15)
+    return (dataset @ dataset.transpose() / sample_count)
 ```
 
 
@@ -59,10 +59,12 @@ def display_side_by_side(df1, df2, name1, name2):
                df2.style.set_table_attributes(inline).set_caption(name2).render())
     return HTML(q)
 
-df_x = pd.DataFrame.from_records(x, columns=['sample{}'.format(num) for num in range(sample_num)], index=['feat_{}'.format(name) for name in 'abcd'])
-df_cx = pd.DataFrame.from_records(c_x, columns=['feat__{}'.format(name) for name in 'abcd'], index=['feat_{}'.format(name) for name in 'abcd'])
-df_y = pd.DataFrame.from_records(y, columns=['sample{}'.format(num) for num in range(sample_num)], index=['new_feat_{}'.format(name) for name in 'efgh'])
-df_cy = pd.DataFrame.from_records(c_y, columns=['new_feat__{}'.format(name) for name in 'efgh'], index=['new_feat_{}'.format(name) for name in 'efgh'])
+df_x = pd.DataFrame.from_records(x, columns=['sample{}'.format(num) for num in range(sample_num)], index=['feat_{}'.format(name) for name in 'abcd']).round(15)
+df_cx = pd.DataFrame.from_records(c_x, columns=['feat__{}'.format(name) for name in 'abcd'], index=['feat_{}'.format(name) for name in 'abcd']).round(15)
+df_y = pd.DataFrame.from_records(y, columns=['sample{}'.format(num) for num in range(sample_num)], index=['new_feat_{}'.format(name) for name in 'efgh']).round(15)
+df_cy = pd.DataFrame.from_records(c_y, columns=['new_feat__{}'.format(name) for name in 'efgh'], index=['new_feat_{}'.format(name) for name in 'efgh']).round(15)
+display(Latex(df_y.to_latex()))
+print(df_y.to_latex())
 display(Latex(df_cy.to_latex()))
 print(df_cy.to_latex())
 # display(df_x)
@@ -83,107 +85,114 @@ $$
 \small
 \begin{array} {cc}
 X & \text{Covariance Matrix of }X \\
-\begin{array} {|l|rrrrrr|}
+\begin{array}{|l|rrrr|}
 \hline
-{} &   sample0 &   sample1 &   sample2 &   sample3 &   sample4 &   sample5 \\ \hline
-feat\_a &  0.293459 &  0.077714 &  0.905751 &  0.613897 &  0.060830 &  0.379016 \\
-feat\_b &  0.378693 &  0.113846 &  0.214324 &  0.538663 &  0.691506 &  0.941329 \\
-feat\_c &  0.080650 &  0.274110 &  0.981330 &  0.051426 &  0.970625 &  0.987066 \\
-feat\_d &  0.571006 &  0.336628 &  0.905613 &  0.825542 &  0.441280 &  0.318327 \\ \hline
+{} &   sample0 &   sample1 &   sample2 &   sample3 \\
+\hline
+new\_feat\_e &  1.237100 &  1.163050 &  1.130956 &  0.699606 \\
+new\_feat\_f & -0.430329 & -0.011550 &  0.560685 & -0.126239 \\
+new\_feat\_g &  0.098891 &  0.074781 &  0.007388 & -0.311131 \\
+new\_feat\_h &  0.048906 & -0.083760 &  0.034965 & -0.003757 \\
+\hline
 \end{array}
 &
-\begin{array} {|l|rrrrrr|}
+\begin{array}{|l|rrrr|}
 \hline
-{} &   sample0 &   sample1 &   sample2 &   sample3 &   sample4 &   sample5 \\ \hline
-feat\_a &  0.293459 &  0.077714 &  0.905751 &  0.613897 &  0.060830 &  0.379016 \\
-feat\_b &  0.378693 &  0.113846 &  0.214324 &  0.538663 &  0.691506 &  0.941329 \\
-feat\_c &  0.080650 &  0.274110 &  0.981330 &  0.051426 &  0.970625 &  0.987066 \\
-feat\_d &  0.571006 &  0.336628 &  0.905613 &  0.825542 &  0.441280 &  0.318327 \\ \hline
-\end{array} \\
+{} &  new\_feat\_\_e &  new\_feat\_\_f &  new\_feat\_\_g &  new\_feat\_\_h \\
+\hline
+new\_feat\_e &     1.162903 &     0.000000 &     0.000000 &     0.000000 \\
+new\_feat\_f &     0.000000 &     0.128905 &     0.000000 &    -0.000000 \\
+new\_feat\_g &     0.000000 &     0.000000 &     0.028057 &    -0.000000 \\
+new\_feat\_h &     0.000000 &    -0.000000 &    -0.000000 &     0.002661 \\
+\hline
+\end{array}
+\\
 \end{array}
 $$
 $$
 \footnotesize
 \begin{array} {cc}
 X & \text{Covariance Matrix of }X \\
-\begin{array} {|l|rrrrrr|}
+\begin{array}{|l|rrrr|}
 \hline
-{} &   sample0 &   sample1 &   sample2 &   sample3 &   sample4 &   sample5 \\ \hline
-feat\_a &  0.293459 &  0.077714 &  0.905751 &  0.613897 &  0.060830 &  0.379016 \\
-feat\_b &  0.378693 &  0.113846 &  0.214324 &  0.538663 &  0.691506 &  0.941329 \\
-feat\_c &  0.080650 &  0.274110 &  0.981330 &  0.051426 &  0.970625 &  0.987066 \\
-feat\_d &  0.571006 &  0.336628 &  0.905613 &  0.825542 &  0.441280 &  0.318327 \\ \hline
+{} &   sample0 &   sample1 &   sample2 &   sample3 \\
+\hline
+new\_feat\_e &  1.237100 &  1.163050 &  1.130956 &  0.699606 \\
+new\_feat\_f & -0.430329 & -0.011550 &  0.560685 & -0.126239 \\
+new\_feat\_g &  0.098891 &  0.074781 &  0.007388 & -0.311131 \\
+new\_feat\_h &  0.048906 & -0.083760 &  0.034965 & -0.003757 \\
+\hline
 \end{array}
 &
-\begin{array} {|l|rrrrrr|}
+\begin{array}{|l|rrrr|}
 \hline
-{} &   sample0 &   sample1 &   sample2 &   sample3 &   sample4 &   sample5 \\ \hline
-feat\_a &  0.293459 &  0.077714 &  0.905751 &  0.613897 &  0.060830 &  0.379016 \\
-feat\_b &  0.378693 &  0.113846 &  0.214324 &  0.538663 &  0.691506 &  0.941329 \\
-feat\_c &  0.080650 &  0.274110 &  0.981330 &  0.051426 &  0.970625 &  0.987066 \\
-feat\_d &  0.571006 &  0.336628 &  0.905613 &  0.825542 &  0.441280 &  0.318327 \\ \hline
-\end{array} \\
+{} &  new\_feat\_\_e &  new\_feat\_\_f &  new\_feat\_\_g &  new\_feat\_\_h \\
+\hline
+new\_feat\_e &     1.162903 &     0.000000 &     0.000000 &     0.000000 \\
+new\_feat\_f &     0.000000 &     0.128905 &     0.000000 &    -0.000000 \\
+new\_feat\_g &     0.000000 &     0.000000 &     0.028057 &    -0.000000 \\
+new\_feat\_h &     0.000000 &    -0.000000 &    -0.000000 &     0.002661 \\
+\hline
+\end{array}
+\\
 \end{array}
 $$
 $$
 \scriptsize
 \begin{array} {cc}
 X & \text{Covariance Matrix of }X \\
-\begin{array} {|l|rrrrrr|}
+\begin{array}{|l|rrrr|}
 \hline
-{} &   sample0 &   sample1 &   sample2 &   sample3 &   sample4 &   sample5 \\ \hline
-feat\_a &  0.293459 &  0.077714 &  0.905751 &  0.613897 &  0.060830 &  0.379016 \\
-feat\_b &  0.378693 &  0.113846 &  0.214324 &  0.538663 &  0.691506 &  0.941329 \\
-feat\_c &  0.080650 &  0.274110 &  0.981330 &  0.051426 &  0.970625 &  0.987066 \\
-feat\_d &  0.571006 &  0.336628 &  0.905613 &  0.825542 &  0.441280 &  0.318327 \\ \hline
+{} &   sample0 &   sample1 &   sample2 &   sample3 \\
+\hline
+new\_feat\_e &  1.237100 &  1.163050 &  1.130956 &  0.699606 \\
+new\_feat\_f & -0.430329 & -0.011550 &  0.560685 & -0.126239 \\
+new\_feat\_g &  0.098891 &  0.074781 &  0.007388 & -0.311131 \\
+new\_feat\_h &  0.048906 & -0.083760 &  0.034965 & -0.003757 \\
+\hline
 \end{array}
 &
-\begin{array} {|l|rrrrrr|}
+\begin{array}{|l|rrrr|}
 \hline
-{} &   sample0 &   sample1 &   sample2 &   sample3 &   sample4 &   sample5 \\ \hline
-feat\_a &  0.293459 &  0.077714 &  0.905751 &  0.613897 &  0.060830 &  0.379016 \\
-feat\_b &  0.378693 &  0.113846 &  0.214324 &  0.538663 &  0.691506 &  0.941329 \\
-feat\_c &  0.080650 &  0.274110 &  0.981330 &  0.051426 &  0.970625 &  0.987066 \\
-feat\_d &  0.571006 &  0.336628 &  0.905613 &  0.825542 &  0.441280 &  0.318327 \\ \hline
-\end{array} \\
+{} &  new\_feat\_\_e &  new\_feat\_\_f &  new\_feat\_\_g &  new\_feat\_\_h \\
+\hline
+new\_feat\_e &     1.162903 &     0.000000 &     0.000000 &     0.000000 \\
+new\_feat\_f &     0.000000 &     0.128905 &     0.000000 &    -0.000000 \\
+new\_feat\_g &     0.000000 &     0.000000 &     0.028057 &    -0.000000 \\
+new\_feat\_h &     0.000000 &    -0.000000 &    -0.000000 &     0.002661 \\
+\hline
+\end{array}
+\\
 \end{array}
 $$
 $$
 \tiny
 \begin{array} {cc}
 X & \text{Covariance Matrix of }X \\
-\begin{array} {|l|rrrrrr|}
+\begin{array}{|l|rrrr|}
 \hline
-{} &   sample0 &   sample1 &   sample2 &   sample3 &   sample4 &   sample5 \\ \hline
-feat\_a &  0.293459 &  0.077714 &  0.905751 &  0.613897 &  0.060830 &  0.379016 \\
-feat\_b &  0.378693 &  0.113846 &  0.214324 &  0.538663 &  0.691506 &  0.941329 \\
-feat\_c &  0.080650 &  0.274110 &  0.981330 &  0.051426 &  0.970625 &  0.987066 \\
-feat\_d &  0.571006 &  0.336628 &  0.905613 &  0.825542 &  0.441280 &  0.318327 \\ \hline
+{} &   sample0 &   sample1 &   sample2 &   sample3 \\
+\hline
+new\_feat\_e &  1.237100 &  1.163050 &  1.130956 &  0.699606 \\
+new\_feat\_f & -0.430329 & -0.011550 &  0.560685 & -0.126239 \\
+new\_feat\_g &  0.098891 &  0.074781 &  0.007388 & -0.311131 \\
+new\_feat\_h &  0.048906 & -0.083760 &  0.034965 & -0.003757 \\
+\hline
 \end{array}
 &
-\begin{array} {|l|rrrrrr|}
+\begin{array}{|l|rrrr|}
 \hline
-{} &   sample0 &   sample1 &   sample2 &   sample3 &   sample4 &   sample5 \\ \hline
-feat\_a &  0.293459 &  0.077714 &  0.905751 &  0.613897 &  0.060830 &  0.379016 \\
-feat\_b &  0.378693 &  0.113846 &  0.214324 &  0.538663 &  0.691506 &  0.941329 \\
-feat\_c &  0.080650 &  0.274110 &  0.981330 &  0.051426 &  0.970625 &  0.987066 \\
-feat\_d &  0.571006 &  0.336628 &  0.905613 &  0.825542 &  0.441280 &  0.318327 \\ \hline
-\end{array} \\
+{} &  new\_feat\_\_e &  new\_feat\_\_f &  new\_feat\_\_g &  new\_feat\_\_h \\
+\hline
+new\_feat\_e &     1.162903 &     0.000000 &     0.000000 &     0.000000 \\
+new\_feat\_f &     0.000000 &     0.128905 &     0.000000 &    -0.000000 \\
+new\_feat\_g &     0.000000 &     0.000000 &     0.028057 &    -0.000000 \\
+new\_feat\_h &     0.000000 &    -0.000000 &    -0.000000 &     0.002661 \\
+\hline
+\end{array}
+\\
 \end{array}
 $$
 
 
-    \begin{tabular}{lrrrr}
-    \toprule
-    {} &  new\_feat\_\_e &  new\_feat\_\_f &  new\_feat\_\_g &  new\_feat\_\_h \\
-    \midrule
-    new\_feat\_e &     1.154401 &    -0.000000 &     -0.00000 &     0.000000 \\
-    new\_feat\_f &    -0.000000 &     0.170968 &      0.00000 &     0.000000 \\
-    new\_feat\_g &    -0.000000 &     0.000000 &      0.01666 &    -0.000000 \\
-    new\_feat\_h &     0.000000 &     0.000000 &     -0.00000 &     0.073687 \\
-    \bottomrule
-    \end{tabular}
-
-
-
-[1]: The reason orthonormality is part of the goal is that we do not want to do anything more than rotating $$X$$. We do not want to modify $$X$$. We only want to re-express $$X$$ by carefully choosing a change of basis.
+[1]: The reason orthonormality is part of the goal is that we do not want to do anything more than rotating $X$. We do not want to modify $X$. We only want to re-express $X$ by carefully choosing a change of basis.
