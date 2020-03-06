@@ -20,179 +20,497 @@ This post is for you if:
 
 ## How to Choose P?
 After hearing my dissatisfaction, my friend [Calvin](https://calvinfeng.github.io/) recommended this paper by Jonathon Shlens - [A Tutorial on Principal Component Analysis](https://arxiv.org/pdf/1404.1100.pdf) to me. It is by far the best resource I have come across on PCA. However, it's also a bit lengthier than your typical blog post, so the remainder of this post will focus on section 5 of the paper. In there, Jonathon immediately establishes the following goal:
-> The [original] dataset is $X$, an $m × n$ matrix.<br>
-> Find some orthonormal matrix $P$ in $Y = PX$ such that $C_Y \equiv \frac{1}{n}YY^T$ is a diagonal matrix.[1]<br>
-> The rows of $P$ shall be principal components of $X$.
+> The [original] dataset is $$X$$, an $$m × n$$ matrix.<br>
+> Find some orthonormal matrix $$P$$ in $$Y = PX$$ such that $$C_Y \equiv \frac{1}{n}YY^T$$ is a diagonal matrix.[1]<br>
+> The rows of $$P$$ shall be principal components of $$X$$.
 
-As you might have noticed, $C_Y$ here is the covariance matrix of our rotated dataset $Y$. Why do we want $C_Y$ to be diagonal? Before we answer this question, let’s generate a dataset $X$ consisting of 4 features with some random values.
+As you might have noticed, $$C_Y$$ here is the covariance matrix of our rotated dataset $$Y$$. Why do we want $$C_Y$$ to be diagonal? Before we answer this question, let’s generate a dataset $$X$$ consisting of 4 features with some random values.
 
 
 ```python
+from IPython.display import Latex, display
+from string import ascii_lowercase
 import numpy as np
-feature_num, sample_num = 4, 4
-x = np.random.rand(feature_num, sample_num)
+import pandas as pd
 
+# constants
+FEAT_NUM, SAMPLE_NUM = 4, 4
+
+# helpers
 def covariance_matrix(dataset):
-    sample_count = dataset.shape[1]
-    return (dataset @ dataset.transpose() / sample_count)
+    return dataset @ dataset.transpose() / SAMPLE_NUM
+
+def tabulate(dataset, rotated=False):
+    '''
+    Label row(s) and column(s) of a matrix by wrapping it in a dataframe.
+    '''
+    if rotated:
+        prefix = 'new_'
+        feats = ascii_lowercase[FEAT_NUM:2 * FEAT_NUM]
+    else:
+        prefix = ''
+        feats = ascii_lowercase[0:FEAT_NUM]
+    return pd.DataFrame.from_records(dataset, 
+                                     columns=['sample{}'.format(num) for num in range(SAMPLE_NUM)], 
+                                     index=['{}feat_{}'.format(prefix, feat) for feat in feats])
+
+def display_df(dataset, latex=False):
+    rounded = dataset.round(15)
+    if latex:
+        display(Latex(rounded.to_latex()))
+    else:
+        display(rounded)
 ```
 
 
 ```python
+x = tabulate(np.random.rand(FEAT_NUM, SAMPLE_NUM))
+display_df(x)
+```
+
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>sample0</th>
+      <th>sample1</th>
+      <th>sample2</th>
+      <th>sample3</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>feat_a</th>
+      <td>0.960266</td>
+      <td>0.541859</td>
+      <td>0.263176</td>
+      <td>0.922409</td>
+    </tr>
+    <tr>
+      <th>feat_b</th>
+      <td>0.874243</td>
+      <td>0.355070</td>
+      <td>0.309325</td>
+      <td>0.785072</td>
+    </tr>
+    <tr>
+      <th>feat_c</th>
+      <td>0.484207</td>
+      <td>0.594282</td>
+      <td>0.566241</td>
+      <td>0.677418</td>
+    </tr>
+    <tr>
+      <th>feat_d</th>
+      <td>0.600766</td>
+      <td>0.775064</td>
+      <td>0.861898</td>
+      <td>0.299897</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+Looks just like any other normal dataset. Nothing special. What about its covariance matrix?
+
+
+```python
+c_x = covariance_matrix(x)
+display_df(c_x)
+```
+
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>feat_a</th>
+      <th>feat_b</th>
+      <th>feat_c</th>
+      <th>feat_d</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>feat_a</th>
+      <td>0.533955</td>
+      <td>0.459367</td>
+      <td>0.390216</td>
+      <td>0.375082</td>
+    </tr>
+    <tr>
+      <th>feat_b</th>
+      <td>0.459367</td>
+      <td>0.400599</td>
+      <td>0.335325</td>
+      <td>0.325616</td>
+    </tr>
+    <tr>
+      <th>feat_c</th>
+      <td>0.390216</td>
+      <td>0.335325</td>
+      <td>0.341788</td>
+      <td>0.360675</td>
+    </tr>
+    <tr>
+      <th>feat_d</th>
+      <td>0.375082</td>
+      <td>0.325616</td>
+      <td>0.360675</td>
+      <td>0.448613</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+![alt text](doesnt_look_like_anything.jpg "Doesn't look like anything to me")
+
+
+```python
+x = tabulate(np.random.rand(FEAT_NUM, SAMPLE_NUM))
 c_x = covariance_matrix(x)
 _, p = np.linalg.eig(c_x)
-y = p.transpose() @ x
+y = tabulate(p.transpose() @ x, rotated=True)
 c_y = covariance_matrix(y)
 ```
 
 
 ```python
-from IPython.display import HTML, Latex, display
-import pandas as pd
-
-def display_side_by_side(df1, df2, name1, name2):
-    inline = 'style="display: float; max-width:50%" class="table"'
-    q = '''
-    <div class="table-responsive col-md-6">{}</div>
-    <div class="table-responsive col-md-6">{}</div>
-    '''.format(df1.style.set_table_attributes(inline).set_caption(name1).render(),
-               df2.style.set_table_attributes(inline).set_caption(name2).render())
-    return HTML(q)
-
-df_x = pd.DataFrame.from_records(x, columns=['sample{}'.format(num) for num in range(sample_num)], index=['feat_{}'.format(name) for name in 'abcd']).round(15)
-df_cx = pd.DataFrame.from_records(c_x, columns=['feat__{}'.format(name) for name in 'abcd'], index=['feat_{}'.format(name) for name in 'abcd']).round(15)
-df_y = pd.DataFrame.from_records(y, columns=['sample{}'.format(num) for num in range(sample_num)], index=['new_feat_{}'.format(name) for name in 'efgh']).round(15)
-df_cy = pd.DataFrame.from_records(c_y, columns=['new_feat__{}'.format(name) for name in 'efgh'], index=['new_feat_{}'.format(name) for name in 'efgh']).round(15)
-display(Latex(df_y.to_latex()))
-print(df_y.to_latex())
-display(Latex(df_cy.to_latex()))
-print(df_cy.to_latex())
-# display(df_x)
-# display(df_cx)
-# display(df_y)
-# display(df_cy)
-
-# display_side_by_side(df_x, df_cx, 'X', 'Covariance Matrix of X')
-# display_side_by_side(df_y, df_cy, 'Y', 'Covariance Matrix of Y')
-# display(df_x.style.set_caption('X'))
-# display(df_cx.style.set_caption('Covariance Matrix of X'))
-# display(df_y.style.set_caption('Y'))
-# display(df_cy.style.set_caption('Covariance Matrix of Y'))
+display_df(x)
+display_df(c_x)
+display_df(y)
+display_df(c_y)
 ```
 
 
-$$
-\small
-\begin{array} {cc}
-X & \text{Covariance Matrix of }X \\
-\begin{array}{|l|rrrr|}
-\hline
-{} &   sample0 &   sample1 &   sample2 &   sample3 \\
-\hline
-new\_feat\_e &  1.237100 &  1.163050 &  1.130956 &  0.699606 \\
-new\_feat\_f & -0.430329 & -0.011550 &  0.560685 & -0.126239 \\
-new\_feat\_g &  0.098891 &  0.074781 &  0.007388 & -0.311131 \\
-new\_feat\_h &  0.048906 & -0.083760 &  0.034965 & -0.003757 \\
-\hline
-\end{array}
-&
-\begin{array}{|l|rrrr|}
-\hline
-{} &  new\_feat\_\_e &  new\_feat\_\_f &  new\_feat\_\_g &  new\_feat\_\_h \\
-\hline
-new\_feat\_e &     1.162903 &     0.000000 &     0.000000 &     0.000000 \\
-new\_feat\_f &     0.000000 &     0.128905 &     0.000000 &    -0.000000 \\
-new\_feat\_g &     0.000000 &     0.000000 &     0.028057 &    -0.000000 \\
-new\_feat\_h &     0.000000 &    -0.000000 &    -0.000000 &     0.002661 \\
-\hline
-\end{array}
-\\
-\end{array}
-$$
-$$
-\footnotesize
-\begin{array} {cc}
-X & \text{Covariance Matrix of }X \\
-\begin{array}{|l|rrrr|}
-\hline
-{} &   sample0 &   sample1 &   sample2 &   sample3 \\
-\hline
-new\_feat\_e &  1.237100 &  1.163050 &  1.130956 &  0.699606 \\
-new\_feat\_f & -0.430329 & -0.011550 &  0.560685 & -0.126239 \\
-new\_feat\_g &  0.098891 &  0.074781 &  0.007388 & -0.311131 \\
-new\_feat\_h &  0.048906 & -0.083760 &  0.034965 & -0.003757 \\
-\hline
-\end{array}
-&
-\begin{array}{|l|rrrr|}
-\hline
-{} &  new\_feat\_\_e &  new\_feat\_\_f &  new\_feat\_\_g &  new\_feat\_\_h \\
-\hline
-new\_feat\_e &     1.162903 &     0.000000 &     0.000000 &     0.000000 \\
-new\_feat\_f &     0.000000 &     0.128905 &     0.000000 &    -0.000000 \\
-new\_feat\_g &     0.000000 &     0.000000 &     0.028057 &    -0.000000 \\
-new\_feat\_h &     0.000000 &    -0.000000 &    -0.000000 &     0.002661 \\
-\hline
-\end{array}
-\\
-\end{array}
-$$
-$$
-\scriptsize
-\begin{array} {cc}
-X & \text{Covariance Matrix of }X \\
-\begin{array}{|l|rrrr|}
-\hline
-{} &   sample0 &   sample1 &   sample2 &   sample3 \\
-\hline
-new\_feat\_e &  1.237100 &  1.163050 &  1.130956 &  0.699606 \\
-new\_feat\_f & -0.430329 & -0.011550 &  0.560685 & -0.126239 \\
-new\_feat\_g &  0.098891 &  0.074781 &  0.007388 & -0.311131 \\
-new\_feat\_h &  0.048906 & -0.083760 &  0.034965 & -0.003757 \\
-\hline
-\end{array}
-&
-\begin{array}{|l|rrrr|}
-\hline
-{} &  new\_feat\_\_e &  new\_feat\_\_f &  new\_feat\_\_g &  new\_feat\_\_h \\
-\hline
-new\_feat\_e &     1.162903 &     0.000000 &     0.000000 &     0.000000 \\
-new\_feat\_f &     0.000000 &     0.128905 &     0.000000 &    -0.000000 \\
-new\_feat\_g &     0.000000 &     0.000000 &     0.028057 &    -0.000000 \\
-new\_feat\_h &     0.000000 &    -0.000000 &    -0.000000 &     0.002661 \\
-\hline
-\end{array}
-\\
-\end{array}
-$$
-$$
-\tiny
-\begin{array} {cc}
-X & \text{Covariance Matrix of }X \\
-\begin{array}{|l|rrrr|}
-\hline
-{} &   sample0 &   sample1 &   sample2 &   sample3 \\
-\hline
-new\_feat\_e &  1.237100 &  1.163050 &  1.130956 &  0.699606 \\
-new\_feat\_f & -0.430329 & -0.011550 &  0.560685 & -0.126239 \\
-new\_feat\_g &  0.098891 &  0.074781 &  0.007388 & -0.311131 \\
-new\_feat\_h &  0.048906 & -0.083760 &  0.034965 & -0.003757 \\
-\hline
-\end{array}
-&
-\begin{array}{|l|rrrr|}
-\hline
-{} &  new\_feat\_\_e &  new\_feat\_\_f &  new\_feat\_\_g &  new\_feat\_\_h \\
-\hline
-new\_feat\_e &     1.162903 &     0.000000 &     0.000000 &     0.000000 \\
-new\_feat\_f &     0.000000 &     0.128905 &     0.000000 &    -0.000000 \\
-new\_feat\_g &     0.000000 &     0.000000 &     0.028057 &    -0.000000 \\
-new\_feat\_h &     0.000000 &    -0.000000 &    -0.000000 &     0.002661 \\
-\hline
-\end{array}
-\\
-\end{array}
-$$
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>sample0</th>
+      <th>sample1</th>
+      <th>sample2</th>
+      <th>sample3</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>feat_a</th>
+      <td>0.032694</td>
+      <td>0.680192</td>
+      <td>0.675898</td>
+      <td>0.585956</td>
+    </tr>
+    <tr>
+      <th>feat_b</th>
+      <td>0.229547</td>
+      <td>0.628407</td>
+      <td>0.402396</td>
+      <td>0.218725</td>
+    </tr>
+    <tr>
+      <th>feat_c</th>
+      <td>0.951576</td>
+      <td>0.404422</td>
+      <td>0.878310</td>
+      <td>0.917486</td>
+    </tr>
+    <tr>
+      <th>feat_d</th>
+      <td>0.814071</td>
+      <td>0.470929</td>
+      <td>0.099848</td>
+      <td>0.923725</td>
+    </tr>
+  </tbody>
+</table>
+</div>
 
 
-[1]: The reason orthonormality is part of the goal is that we do not want to do anything more than rotating $X$. We do not want to modify $X$. We only want to re-express $X$ by carefully choosing a change of basis.
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>feat_a</th>
+      <th>feat_b</th>
+      <th>feat_c</th>
+      <th>feat_d</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>feat_a</th>
+      <td>0.315979</td>
+      <td>0.208771</td>
+      <td>0.359363</td>
+      <td>0.238922</td>
+    </tr>
+    <tr>
+      <th>feat_b</th>
+      <td>0.208771</td>
+      <td>0.164338</td>
+      <td>0.256670</td>
+      <td>0.181256</td>
+    </tr>
+    <tr>
+      <th>feat_c</th>
+      <td>0.359363</td>
+      <td>0.256670</td>
+      <td>0.670566</td>
+      <td>0.475077</td>
+    </tr>
+    <tr>
+      <th>feat_d</th>
+      <td>0.238922</td>
+      <td>0.181256</td>
+      <td>0.475077</td>
+      <td>0.436931</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>sample0</th>
+      <th>sample1</th>
+      <th>sample2</th>
+      <th>sample3</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>new_feat_e</th>
+      <td>1.156732</td>
+      <td>0.991074</td>
+      <td>1.054079</td>
+      <td>1.416422</td>
+    </tr>
+    <tr>
+      <th>new_feat_f</th>
+      <td>-0.506006</td>
+      <td>0.401910</td>
+      <td>0.422045</td>
+      <td>-0.182063</td>
+    </tr>
+    <tr>
+      <th>new_feat_g</th>
+      <td>-0.147386</td>
+      <td>-0.102179</td>
+      <td>0.002545</td>
+      <td>0.189964</td>
+    </tr>
+    <tr>
+      <th>new_feat_h</th>
+      <td>-0.078583</td>
+      <td>0.297806</td>
+      <td>-0.333089</td>
+      <td>0.103679</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>new_feat_e</th>
+      <th>new_feat_f</th>
+      <th>new_feat_g</th>
+      <th>new_feat_h</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>new_feat_e</th>
+      <td>1.359398</td>
+      <td>-0.000000</td>
+      <td>0.000000</td>
+      <td>-0.00000</td>
+    </tr>
+    <tr>
+      <th>new_feat_f</th>
+      <td>-0.000000</td>
+      <td>0.157211</td>
+      <td>-0.000000</td>
+      <td>-0.00000</td>
+    </tr>
+    <tr>
+      <th>new_feat_g</th>
+      <td>0.000000</td>
+      <td>-0.000000</td>
+      <td>0.017064</td>
+      <td>0.00000</td>
+    </tr>
+    <tr>
+      <th>new_feat_h</th>
+      <td>-0.000000</td>
+      <td>-0.000000</td>
+      <td>0.000000</td>
+      <td>0.05414</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+```python
+display_df(x, latex=True)
+display_df(c_x, latex=True)
+display_df(y, latex=True)
+display_df(c_y, latex=True)
+```
+
+
+\begin{tabular}{lrrrr}
+\toprule
+{} &   sample0 &   sample1 &   sample2 &   sample3 \\
+\midrule
+feat\_a &  0.032694 &  0.680192 &  0.675898 &  0.585956 \\
+feat\_b &  0.229547 &  0.628407 &  0.402396 &  0.218725 \\
+feat\_c &  0.951576 &  0.404422 &  0.878310 &  0.917486 \\
+feat\_d &  0.814071 &  0.470929 &  0.099848 &  0.923725 \\
+\bottomrule
+\end{tabular}
+
+
+
+
+\begin{tabular}{lrrrr}
+\toprule
+{} &    feat\_a &    feat\_b &    feat\_c &    feat\_d \\
+\midrule
+feat\_a &  0.315979 &  0.208771 &  0.359363 &  0.238922 \\
+feat\_b &  0.208771 &  0.164338 &  0.256670 &  0.181256 \\
+feat\_c &  0.359363 &  0.256670 &  0.670566 &  0.475077 \\
+feat\_d &  0.238922 &  0.181256 &  0.475077 &  0.436931 \\
+\bottomrule
+\end{tabular}
+
+
+
+
+\begin{tabular}{lrrrr}
+\toprule
+{} &   sample0 &   sample1 &   sample2 &   sample3 \\
+\midrule
+new\_feat\_e &  1.156732 &  0.991074 &  1.054079 &  1.416422 \\
+new\_feat\_f & -0.506006 &  0.401910 &  0.422045 & -0.182063 \\
+new\_feat\_g & -0.147386 & -0.102179 &  0.002545 &  0.189964 \\
+new\_feat\_h & -0.078583 &  0.297806 & -0.333089 &  0.103679 \\
+\bottomrule
+\end{tabular}
+
+
+
+
+\begin{tabular}{lrrrr}
+\toprule
+{} &  new\_feat\_e &  new\_feat\_f &  new\_feat\_g &  new\_feat\_h \\
+\midrule
+new\_feat\_e &    1.359398 &   -0.000000 &    0.000000 &    -0.00000 \\
+new\_feat\_f &   -0.000000 &    0.157211 &   -0.000000 &    -0.00000 \\
+new\_feat\_g &    0.000000 &   -0.000000 &    0.017064 &     0.00000 \\
+new\_feat\_h &   -0.000000 &   -0.000000 &    0.000000 &     0.05414 \\
+\bottomrule
+\end{tabular}
+
+
+
+[1]: The reason orthonormality is part of the goal is that we do not want to do anything more than rotating $$X$$. We do not want to modify $$X$$. We only want to re-express $$X$$ by carefully choosing a change of basis.
