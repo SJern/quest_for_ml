@@ -50,8 +50,8 @@ def tabulate(dataset, rotated=False):
     else:
         prefix = ''
         feats = ascii_lowercase[0:FEAT_NUM]
-    return pd.DataFrame.from_records(dataset, 
-                                     columns=['sample{}'.format(num) for num in range(SAMPLE_NUM)], 
+    return pd.DataFrame.from_records(dataset,
+                                     columns=['sample{}'.format(num) for num in range(SAMPLE_NUM)],
                                      index=['{}feat_{}'.format(prefix, feat) for feat in feats])
 
 def display_df(dataset, latex=False):
@@ -194,7 +194,7 @@ display_df(c_x)
 </div>
 
 
-![alt text](doesnt_look_like_anything.jpg "Doesn't look like anything to me")
+![westworld](./doesnt_look_like_anything.jpg "Doesn't look like anything to me")
 
 
 ```python
