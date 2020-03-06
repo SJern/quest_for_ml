@@ -168,7 +168,7 @@ display_df(c_x)
 </div>
 
 
-![westworld](assets/doesnt_look_like_anything.jpg "Doesn't look like anything to me")
+![westworld](assets/doesnt_look_like_anything.jpg)
 
 
 ```python
