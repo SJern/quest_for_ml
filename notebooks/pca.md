@@ -167,7 +167,7 @@ display_df(c_x)
 </table>
 </div>
 
-Sorry. I just had to...
+
 ![Have you ever questioned the nature of your reality?](assets/doesnt_look_like_anything.jpg)
 
 
