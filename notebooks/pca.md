@@ -168,7 +168,7 @@ display_df(c_x)
 </div>
 
 
-![westworld](assets/doesnt_look_like_anything.jpg)
+<img src="assets/doesnt_look_like_anything.jpg" alt="alternate text for image" width="auto" title="A proper title attribute" />
 
 
 ```python
