@@ -167,8 +167,8 @@ display_df(c_x)
 </table>
 </div>
 
-
-![Please excuse my Westworld meme](assets/doesnt_look_like_anything.jpg)
+Sorry. I just had to...
+![Have you ever questioned the nature of your reality?](assets/doesnt_look_like_anything.jpg)
 
 
 ```python
