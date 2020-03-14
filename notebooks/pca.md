@@ -27,9 +27,7 @@ After hearing my dissatisfaction, my friend [Calvin](https://calvinfeng.github.i
 As you might have noticed, $C_Y$ here is the covariance matrix of our rotated dataset $Y$. Why do we want $C_Y$ to be diagonal? Before we answer this question, let’s generate a dataset $X$ consisting of 4 features with some random values.
 
 
-<details>
-  <summary>Skippable imports and helpers</summary>
-
+{% fold summary="Skippable imports and helpers" %}
 ```python
 from IPython.display import Latex, display
 from string import ascii_lowercase
@@ -64,7 +62,7 @@ def display_df(dataset, latex=False):
     else:
         display(rounded)
 ```
-</details>
+{% endfold %}
 
 ```python
 x = tabulate(np.random.rand(FEAT_NUM, SAMPLE_NUM))
