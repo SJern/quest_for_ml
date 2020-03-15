@@ -4,40 +4,39 @@ I have recently taken an interest in PCA after watching Professor Gilbert Strang
 - Why that promise is very useful in Data Science; and
 - How to extract these principal components. (Although I don't agree with how some of them do it by applying SVD on the covariance matrix, that can be saved for another post.)
 
-Some of them go the extra mile to show us graphically or logically, how the promise is being fulfilled by the principal components:
-- Graphically, a transformed vector can be shown to be still clustered with its original group in a plot; and
-- Logically, a proof can be expressed in mathematical symbols.
+Some of them go the extra mile to show how the promise is being fulfilled graphically. For example, a transformed vector can be shown to be still clustered with its original group in a plot.
 
 ## Objective
-My mind was convinced, but my heart was still not. To me, the graphic approach does not provide a visual effect that is striking enough. The logic approach, on the other hand, does not even spend enough effort to explain what precisely it's trying to prove. Therefore, the objective of this post is to improve both of these 2 areas - to provide a more striking visual and to establish a more precise goal for our mathematical proof.
+To me, the plot does not provide a visual effect that is striking enough. The components extraction part, on the other hand, mostly talks about how only. Therefore, the objective of this post is to shift our focus onto these 2 areas - to establish a more precise goal before we dive into the components extraction part, and to bring an end to this post with a more striking visual.
 
 ## Prerequisites
 This post is for you if:
-- You have at least a slight idea of what the PCA promise is;
+- You have already seen the aforementioned plot - just a bonus actually;
 - You have a decent understanding of what the covariance matrix is about;
-- You have a solid foundation in linear algebra, e.g., comfortable with the concept of matrices being transformations that rotate and/or stretch spaces; and
+- You have a good foundation in linear algebra; and
 - Your heart is longing to discover the principal components, instead of being told what they are!
 
 ## How to Choose P?
 After hearing my dissatisfaction, my friend [Calvin](https://calvinfeng.github.io/) recommended this paper by Jonathon Shlens - [A Tutorial on Principal Component Analysis](https://arxiv.org/pdf/1404.1100.pdf) to me. It is by far the best resource I have come across on PCA. However, it's also a bit lengthier than your typical blog post, so the remainder of this post will focus on section 5 of the paper. In there, Jonathon immediately establishes the following goal:
-> The [original] dataset is $X$, an $m × n$ matrix.<br />
-> Find some orthonormal matrix $P$ in $Y = PX$ such that $C_Y \equiv \frac{1}{n}YY^T$ is a diagonal matrix.[1]<br />
-> The rows of $P$ shall be principal components of $X$.
+> The [original] dataset is $$X$$, an $$m × n$$ matrix.<br />
+> Find some orthonormal matrix $$P$$ in $$Y = PX$$ such that $$C_Y \equiv \frac{1}{n}YY^T$$ is a diagonal matrix.[1]<br />
+> The rows of $$P$$ shall be principal components of $$X$$.
 
-As you might have noticed, $C_Y$ here is the covariance matrix of our rotated dataset $Y$. Why do we want $C_Y$ to be diagonal? Before we answer this question, let’s generate a dataset $X$ consisting of 4 features with some random values.
+As you might have noticed, $$C_Y$$ here is the covariance matrix of our rotated dataset $$Y$$. Why do we want $$C_Y$$ to be diagonal? Before we address this question, let’s generate a dataset $$X$$ consisting of 4 features with some random values.
 
 
-{% fold summary="Skippable imports and helpers" %}
 ```python
+"""
+Mostly helper functions.
+Skip ahead unles you would like to follow the steps on your local machine.
+"""
 from IPython.display import Latex, display
 from string import ascii_lowercase
 import numpy as np
 import pandas as pd
 
-# constants
 FEAT_NUM, SAMPLE_NUM = 4, 4
 
-# helpers
 def covariance_matrix(dataset):
     return dataset @ dataset.transpose() / SAMPLE_NUM
 
@@ -62,7 +61,7 @@ def display_df(dataset, latex=False):
     else:
         display(rounded)
 ```
-{% endfold %}
+
 
 ```python
 x = tabulate(np.random.rand(FEAT_NUM, SAMPLE_NUM))
@@ -71,19 +70,6 @@ display_df(x)
 
 
 <div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
 <table border="1" class="dataframe">
   <thead>
     <tr style="text-align: right;">
@@ -128,7 +114,7 @@ display_df(x)
 </div>
 
 
-$X$ above just looks like a normal dataset. Nothing special. What about its covariance matrix?
+$$X$$ above just looks like a normal dataset. Nothing special. What about its covariance matrix?
 
 
 ```python
@@ -138,19 +124,6 @@ display_df(c_x)
 
 
 <div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
 <table border="1" class="dataframe">
   <thead>
     <tr style="text-align: right;">
@@ -197,8 +170,7 @@ display_df(c_x)
 
 ![Have you ever questioned the nature of your reality?](assets/doesnt_look_like_anything.jpg)
 
-Its covariance matrix $C_X$ doesn't look that intersting either. However, let us recall that the covariance matrix is always a symmetric matrix with the variances on its diagonal and the covariances off-diagonal, i.e., having the following form:
-
+Its covariance matrix $$C_X$$ doesn't look that intersting either. However, let us recall that the covariance matrix is always a symmetric matrix with the variances on its diagonal and the covariances off-diagonal, i.e., having the following form:
 $$
 \large
 \begin{vmatrix}
@@ -207,12 +179,10 @@ cov(b, a) &  var(b, b) &  cov(b, c) \\
 cov(c, a) &  cov(c, b) &  var(c, c) \\
 \end{vmatrix}
 $$
-
-Let's also recall that $cov(x, y)$ is zero if and only if feature x and y are uncorrelated. The non-zero convariances in $C_X$ is an indication that there are quite some redundant feature measurements in $X$. So what we are trying to do here is feature extraction. We would like to rotate our dataset in a way such that the change of basis will represented by features that are uncorrelated to each other, i.e., having a new covariance matrix that is diagonal.
+Let's also recall that $$cov(x, y)$$ is zero if and only if feature x and y are uncorrelated. The non-zero convariances in $$C_X$$ is an indication that there are quite some redundant features in $$X$$. What we are going to do here is feature extraction. We would like to rotate our dataset in a way such that the change of basis will bring us features that are uncorrelated to each other, i.e., having a new covariance matrix that is diagonal.
 
 ### Time to Choose
 With a clearer goal now, let's figure out how we can achieve it.
-
 $$
 \begin{array}{ccc}
 \text{Givens} & \text{Goal} & \text{Unknown} \\
@@ -222,42 +192,31 @@ $$
 & \text{How to Choose }P\text{?}
 \end{array}
 $$
-
-From the givens above, we are able to derive the relationship between $C_Y$ and $C_X$ in terms of $P$:
-
+From the givens above, we are able to derive the relationship between $$C_Y$$ and $$C_X$$ in terms of $$P$$:
 $$
 C_Y = \frac{1}{n}YY^T = \frac{1}{n}(PX)(PX)^T = \frac{1}{n}PXX^TP^T
 $$
-
 $$
 C_Y = PC_XP^T
 $$
-
 Let's recall one more time that all covariance matrices are symmetric, and any symmetric matrix can be "Eigendecomposed" as
-
 $$
 Q{\Lambda}Q^T
 $$
-
-where $Q$ is an orthogonal matrix whose columns are the eigenvectors of the symmetric matrix, and $\Lambda$ is a diagonal matrix whose entries are the eigenvalues. There is usally more than one way to choose $P$, but Eigendecomposing $C_X$ will prove to make our life much easier. Let's see what we can do with it:
-
+where $$Q$$ is an orthogonal matrix whose columns are the eigenvectors of the symmetric matrix, and $$\Lambda$$ is a diagonal matrix whose entries are the eigenvalues. There is usally more than one way to choose $$P$$, but Eigendecomposing $$C_X$$ will prove to make our life much easier. Let's see what we can do with it:
 $$
 C_Y = PQ{\Lambda}Q^TP^T
 $$
-
-Since we know $\Lambda$ is diagonal and $Q^TQ \equiv I$, what if we choose $P$ to be $Q^T$?
-
+Since we know $$\Lambda$$ is diagonal and $$Q^TQ \equiv I$$, what if we choose $$P$$ to be $$Q^T$$?
 $$
 C_Y = Q^TQ{\Lambda}Q^TQ = I{\Lambda}I
 $$
-
 $$
 C_Y = \Lambda
 $$
+Voilà, by choosing $$P$$ to be eigenvectors of $$C_X$$, we are able to transform $$X$$ into $$Y$$ whose features are uncorrelated to each other!
 
-Voilà, by choosing $P$ to eigenvectors of $C_X$, we are able to transform $X$ into $Y$ whose features are uncorrelated to each other!
-
-### Show
+### Test it
 Well, that was quite convenient, wasn't it? What's even better is that we can demonstrate it in a few lines of code:
 
 
@@ -270,19 +229,6 @@ display_df(y)
 
 
 <div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
 <table border="1" class="dataframe">
   <thead>
     <tr style="text-align: right;">
@@ -327,7 +273,7 @@ display_df(y)
 </div>
 
 
-The transformed dataset $Y$ with the newly extracted features e to h doesn't look like anything either, but what about its convariance matrix??
+The transformed dataset $$Y$$ with the newly extracted features $$e$$ to $$h$$, doesn't look like anything either. What about its convariance matrix??
 
 
 ```python
@@ -337,19 +283,6 @@ display_df(c_y)
 
 
 <div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
 <table border="1" class="dataframe">
   <thead>
     <tr style="text-align: right;">
@@ -394,7 +327,7 @@ display_df(c_y)
 </div>
 
 
-Holy moly, isn't this exactly what we were aiming for, with just a few lines of code? From a dataset with some redundant and less interesting fetures, we have extracted new features that are much more meaningful to look at, simply by diagonalizing its convariance matrix. Let's wrap this up with some side-by-side comparisons.
+Holy moly, isn't this exactly what we were aiming for from the beginning, with just a few lines of code? From a dataset with some redundant and less interesting fetures, we have extracted new features that are much more meaningful to look at, simply by diagonalizing its convariance matrix. Let's wrap this up with some side-by-side comparisons.
 
 
 ```python
@@ -467,4 +400,4 @@ $$
 
 Look at this. Isn't it just beautiful?
 
-[1]: The reason orthonormality is part of the goal is that we do not want to do anything more than rotations. We do not want to modify $X$. We only want to re-express $X$ by carefully choosing a change of basis.
+[1]: The reason orthonormality is part of the goal is that we do not want to do anything more than rotations. We do not want to modify $$X$$. We only want to re-express $$X$$ by carefully choosing a change of basis.
